@@ -4,7 +4,7 @@ var extractModuleHeader = require( './extractModuleHeader' ),
 
 
 module.exports = function( filePath ) {
-	var fileContent  = fs.readFileSync( filePath ).toString( 'utf-8' )
+	var fileContent = fs.readFileSync( filePath ).toString( 'utf-8' )
 
 	try {
 		var moduleHeader = extractModuleHeader( fileContent )
