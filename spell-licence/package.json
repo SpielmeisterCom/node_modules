@@ -1,0 +1,17 @@
+{
+	"author": "Spielmeister GmbH",
+	"name": "spell-licence",
+	"description": "utilities for working with licence information",
+	"version": "0.0.1",
+	"main": "lib/index",
+	"directories": {
+		"lib": "./lib"
+	},
+	"license": "MIT",
+	"engines": {
+		"node": "0.10"
+	},
+	"dependencies": {},
+	"devDependencies": {},
+	"optionalDependencies": {}
+}
