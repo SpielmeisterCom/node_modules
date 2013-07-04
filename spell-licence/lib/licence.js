@@ -55,11 +55,17 @@ var wrap = function( rawLicence ) {
  * @param licence
  */
 var unwrap = function( licence ) {
-	var lines  = licence.split( '\n' ),
-		rawLicence = ''
+	var lines = _.filter(
+		licence.split( '\n' ),
+		function( line ) {
+			return line != ''
+		}
+	)
+
+	var rawLicence = ''
 
 	if( lines.length < 3 ) {
-		console.err( 'Error: Lincence file is corrupted.' )
+		console.error( 'Error: Lincence is corrupted.' )
 		process.exit( 1 )
 	}
 
