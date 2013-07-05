@@ -1,7 +1,7 @@
 {
 	"author": "Spielmeister GmbH",
-	"name": "spell-licence",
-	"description": "utilities for working with licence information",
+	"name": "spell-license",
+	"description": "utilities for working with license information",
 	"version": "0.0.1",
 	"main": "lib/index",
 	"directories": {

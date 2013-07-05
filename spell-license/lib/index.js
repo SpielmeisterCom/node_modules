@@ -28,41 +28,41 @@ var createPaddedNumber = function( number, length ) {
 }
 
 /**
- * Adds licence header and footer.
+ * Adds license header and footer.
  *
- * @param rawLicence
+ * @param rawLicense
  */
-var wrap = function( rawLicence ) {
-	// add header and footer and break licence into lines of MAX_LINE_LENGTH length
-	var numLines = Math.ceil( rawLicence.length / MAX_LINE_LENGTH ),
-		lines    = [ '-----BEGIN LICENCE KEY-----' ]
+var wrap = function( rawLicense ) {
+	// add header and footer and break license into lines of MAX_LINE_LENGTH length
+	var numLines = Math.ceil( rawLicense.length / MAX_LINE_LENGTH ),
+		lines    = [ '-----BEGIN LICENSE KEY-----' ]
 
 	for( var i = 0, from, until, n = numLines; i < n; i++ ) {
 		from  = i * MAX_LINE_LENGTH
 		until = i + 1 < n ? from + MAX_LINE_LENGTH : undefined
 
-		lines.push( rawLicence.slice( from, until ) )
+		lines.push( rawLicense.slice( from, until ) )
 	}
 
-	lines.push( '-----END LICENCE KEY-----' )
+	lines.push( '-----END LICENSE KEY-----' )
 
 	return lines.join( '\n' )
 }
 
 /**
- * Removes licence header and footer.
+ * Removes license header and footer.
  *
- * @param licence
+ * @param license
  */
-var unwrap = function( licence ) {
+var unwrap = function( license ) {
 	var lines = _.filter(
-		licence.split( '\n' ),
+		license.split( '\n' ),
 		function( line ) {
 			return line != ''
 		}
 	)
 
-	var rawLicence = ''
+	var rawLicense = ''
 
 	if( lines.length < 3 ) {
 		console.error( 'Error: Lincence is corrupted.' )
@@ -70,10 +70,10 @@ var unwrap = function( licence ) {
 	}
 
 	for( var i = 1, n = lines.length - 1; i < n; i++ ) {
-		rawLicence += lines[ i ]
+		rawLicense += lines[ i ]
 	}
 
-	return rawLicence
+	return rawLicense
 }
 
 var serialize = function( privateKey, version, payload ) {
@@ -88,10 +88,10 @@ var serialize = function( privateKey, version, payload ) {
 	return wrap( version + buffer.toString( 'base64' ) )
 }
 
-var parse = function( licence ) {
-	var rawLicence        = unwrap( licence ),
-		version           = rawLicence.slice( FORMAT_VERSION_OFFSET, FORMAT_VERSION_LENGTH ),
-		contentBase64     = rawLicence.slice( FORMAT_VERSION_LENGTH ),
+var parse = function( license ) {
+	var rawLicense        = unwrap( license ),
+		version           = rawLicense.slice( FORMAT_VERSION_OFFSET, FORMAT_VERSION_LENGTH ),
+		contentBase64     = rawLicense.slice( FORMAT_VERSION_LENGTH ),
 		content           = new Buffer( contentBase64, 'base64' ).toString(),
 		signatureLength   = parseInt( content.slice( SIGNATURE_LENGTH_OFFSET, SIGNATURE_LENGTH_LENGTH ), 10 ),
 		signature         = content.slice( SIGNATURE_OFFSET, SIGNATURE_OFFSET + signatureLength ),
@@ -104,7 +104,7 @@ var parse = function( licence ) {
 }
 
 /**
- * Creates a licence data string.
+ * Creates a license data string.
  *
  * @param privateKey
  * @param payload {Object}
@@ -127,34 +127,34 @@ var create = function( privateKey, payload ) {
 }
 
 /**
- * Verifies that the licence data string was signed with the supplied key.
+ * Verifies that the license data string was signed with the supplied key.
  *
  * @param publicKey
- * @param licenceData
+ * @param licenseData
  * @return {*}
  */
-var verify = function( publicKey, licenceData ) {
+var verify = function( publicKey, licenseData ) {
 	if( !publicKey ) {
 		throw 'Error: "publicKey" is undefined.'
 	}
 
-	var licence = parse( licenceData )
+	var license = parse( licenseData )
 
 	var isValid = crypto.createVerify( 'DSS1' )
-		.update( licence.payloadSerialized )
-		.verify( publicKey, licence.signature, 'hex' )
+		.update( license.payloadSerialized )
+		.verify( publicKey, license.signature, 'hex' )
 
 	return isValid
 }
 
 /**
- * Returns the payload contained in a licence data string.
+ * Returns the payload contained in a license data string.
  *
- * @param licenceData
+ * @param licenseData
  * @return {*}
  */
-var createPayload = function( licenceData ) {
-	return JSON.parse( parse( licenceData ).payloadSerialized )
+var createPayload = function( licenseData ) {
+	return JSON.parse( parse( licenseData ).payloadSerialized )
 }
 
 module.exports = {
