@@ -71,8 +71,7 @@ var unwrap = function( license ) {
 	var rawLicense = ''
 
 	if( lines.length == 0 ) {
-		console.error( 'Error: License is corrupted.' )
-		process.exit( 1 )
+		return
 	}
 
 	for( var i = 0, n = lines.length; i < n; i++ ) {
@@ -95,13 +94,23 @@ var serialize = function( privateKey, version, payload, licensee ) {
 }
 
 var parse = function( license ) {
-	var rawLicense        = unwrap( license ),
-		version           = rawLicense.slice( FORMAT_VERSION_OFFSET, FORMAT_VERSION_LENGTH ),
-		contentBase64     = rawLicense.slice( FORMAT_VERSION_LENGTH ),
-		content           = new Buffer( contentBase64, 'base64' ).toString(),
-		signatureLength   = parseInt( content.slice( SIGNATURE_LENGTH_OFFSET, SIGNATURE_LENGTH_LENGTH ), 10 ),
-		signature         = content.slice( SIGNATURE_OFFSET, SIGNATURE_OFFSET + signatureLength ),
-		payloadSerialized = content.slice( SIGNATURE_OFFSET + signatureLength )
+	var rawLicense = unwrap( license )
+
+	if( !rawLicense ) {
+		return
+	}
+
+	try {
+		var version           = rawLicense.slice( FORMAT_VERSION_OFFSET, FORMAT_VERSION_LENGTH ),
+			contentBase64     = rawLicense.slice( FORMAT_VERSION_LENGTH ),
+			content           = new Buffer( contentBase64, 'base64' ).toString(),
+			signatureLength   = parseInt( content.slice( SIGNATURE_LENGTH_OFFSET, SIGNATURE_LENGTH_LENGTH ), 10 ),
+			signature         = content.slice( SIGNATURE_OFFSET, SIGNATURE_OFFSET + signatureLength ),
+			payloadSerialized = content.slice( SIGNATURE_OFFSET + signatureLength )
+
+	} catch( e ) {
+		return
+	}
 
 	return {
 		signature : signature,
@@ -147,6 +156,10 @@ var verify = function( publicKey, licenseData ) {
 
 	var license = parse( licenseData )
 
+	if( !license ) {
+		return
+	}
+
 	var isValid = crypto.createVerify( 'DSS1' )
 		.update( license.payloadSerialized )
 		.verify( publicKey, license.signature, 'hex' )
@@ -161,7 +174,20 @@ var verify = function( publicKey, licenseData ) {
  * @return {*}
  */
 var createPayload = function( licenseData ) {
-	return JSON.parse( parse( licenseData ).payloadSerialized )
+	var license = parse( licenseData )
+
+	if( !license ) {
+		return
+	}
+
+	try {
+		var payload = JSON.parse( license.payloadSerialized )
+
+	} catch( e ) {
+		return
+	}
+
+	return payload
 }
 
 module.exports = {
