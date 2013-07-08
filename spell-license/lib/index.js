@@ -71,7 +71,7 @@ var unwrap = function( license ) {
 	var rawLicense = ''
 
 	if( lines.length == 0 ) {
-		console.error( 'Error: Lincence is corrupted.' )
+		console.error( 'Error: License is corrupted.' )
 		process.exit( 1 )
 	}
 
