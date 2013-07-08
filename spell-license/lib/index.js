@@ -31,11 +31,16 @@ var createPaddedNumber = function( number, length ) {
  * Adds license header and footer.
  *
  * @param rawLicense
+ * @param licensee
  */
-var wrap = function( rawLicense ) {
+var wrap = function( rawLicense, licensee ) {
 	// add header and footer and break license into lines of MAX_LINE_LENGTH length
 	var numLines = Math.ceil( rawLicense.length / MAX_LINE_LENGTH ),
-		lines    = [ '-----BEGIN LICENSE KEY-----' ]
+		lines    = [ '---BEGIN LICENSE KEY---' ]
+
+	if( licensee ) {
+		lines.push( [ '---This personal license is issued to ' + licensee + '.---' ] )
+	}
 
 	for( var i = 0, from, until, n = numLines; i < n; i++ ) {
 		from  = i * MAX_LINE_LENGTH
@@ -44,7 +49,7 @@ var wrap = function( rawLicense ) {
 		lines.push( rawLicense.slice( from, until ) )
 	}
 
-	lines.push( '-----END LICENSE KEY-----' )
+	lines.push( '---END LICENSE KEY---' )
 
 	return lines.join( '\n' )
 }
@@ -58,25 +63,26 @@ var unwrap = function( license ) {
 	var lines = _.filter(
 		license.split( '\n' ),
 		function( line ) {
-			return line != ''
+			return line.length >= 2 &&
+				line.substr( 0, 2 ) != '--'
 		}
 	)
 
 	var rawLicense = ''
 
-	if( lines.length < 3 ) {
+	if( lines.length == 0 ) {
 		console.error( 'Error: Lincence is corrupted.' )
 		process.exit( 1 )
 	}
 
-	for( var i = 1, n = lines.length - 1; i < n; i++ ) {
+	for( var i = 0, n = lines.length; i < n; i++ ) {
 		rawLicense += lines[ i ]
 	}
 
 	return rawLicense
 }
 
-var serialize = function( privateKey, version, payload ) {
+var serialize = function( privateKey, version, payload, licensee ) {
 	var payloadSerialized = JSON.stringify( payload )
 
 	var signature = crypto.createSign( 'DSS1' )
@@ -85,7 +91,7 @@ var serialize = function( privateKey, version, payload ) {
 
 	var buffer = new Buffer( createPaddedNumber( signature.length, SIGNATURE_LENGTH_LENGTH ) + signature + payloadSerialized )
 
-	return wrap( version + buffer.toString( 'base64' ) )
+	return wrap( version + buffer.toString( 'base64' ), licensee )
 }
 
 var parse = function( license ) {
@@ -108,9 +114,10 @@ var parse = function( license ) {
  *
  * @param privateKey
  * @param payload {Object}
+ * @param licensee
  * @return {String}
  */
-var create = function( privateKey, payload ) {
+var create = function( privateKey, payload, licensee ) {
 	if( !privateKey ) {
 		throw 'Error: "privateKey" is undefined.'
 	}
@@ -123,7 +130,7 @@ var create = function( privateKey, payload ) {
 		throw 'Error: "payload" must be of type "object".'
 	}
 
-	return serialize( privateKey, FORMAT_VERSION, payload )
+	return serialize( privateKey, FORMAT_VERSION, payload, licensee )
 }
 
 /**
