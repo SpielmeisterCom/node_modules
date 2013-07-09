@@ -10,6 +10,33 @@ var	FORMAT_VERSION          = '01',
 	SIGNATURE_OFFSET        = SIGNATURE_LENGTH_OFFSET + SIGNATURE_LENGTH_LENGTH,
 	MAX_LINE_LENGTH         = 64
 
+var PRODUCTS = {
+	'SpellJS free' : {
+		features : [
+			{
+				name : 'forcedSplashScreen',
+				included : true
+			}
+		]
+	},
+	'SpellJS standard' : {
+		features : [
+			{
+				name : 'forcedSplashScreen',
+				included : false
+			}
+		]
+	},
+	'SpellJS professional' : {
+		features : [
+			{
+				name : 'forcedSplashScreen',
+				included : false
+			}
+		]
+	}
+}
+
 /**
  * Creates a string representation of the numer of supplied length.
  *
@@ -190,8 +217,59 @@ var createPayload = function( licenseData ) {
 	return payload
 }
 
+/**
+ * Creates a license info object.
+ *
+ * @param publicKey
+ * @param licenseData
+ * @return {Object}
+ */
+var createLicenseInfo = function( publicKey, licenseData ) {
+	// signature
+	var isSignatureValid = verify( publicKey, licenseData )
+
+	if( !isSignatureValid ) {
+		return {
+			error : 'Error: License signature is invalid.'
+		}
+	}
+
+	// payload
+	var payload = createPayload( licenseData )
+
+	if( !payload ) {
+		return {
+			error : 'Error: Could not create payload from license data.'
+		}
+	}
+
+	// product features
+	var product = PRODUCTS[ payload.pid ]
+
+	if( !payload ) {
+		return {
+			error : 'Error: License includes unkown product id "' + payload.pid + '".'
+		}
+	}
+
+	// validity period
+	var nowInUnixtime            = Math.ceil( new Date().getTime() / 1000 ),
+		issueDateInUnixtime      = Math.ceil( new Date( payload.isd ).getTime() / 1000 ),
+		validityPeriodInUnixtime = payload.days * 24 * 60 * 60,
+		isInValidityPeriod       = nowInUnixtime < issueDateInUnixtime + validityPeriodInUnixtime
+
+	return {
+		payload : payload,
+		productFeatures : product.features,
+		isInValidityPeriod : isInValidityPeriod,
+		isSignatureValid : isSignatureValid,
+		isValid : isSignatureValid && isInValidityPeriod
+	}
+}
+
 module.exports = {
 	create : create,
+	createLicenseInfo : createLicenseInfo,
 	createPayload : createPayload,
 	verify : verify
 }
