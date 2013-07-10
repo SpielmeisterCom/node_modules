@@ -246,7 +246,7 @@ var createLicenseInfo = function( publicKey, licenseData ) {
 	// product features
 	var product = PRODUCTS[ payload.pid ]
 
-	if( !payload ) {
+	if( !product ) {
 		return {
 			error : 'Error: License includes unkown product id "' + payload.pid + '".'
 		}
