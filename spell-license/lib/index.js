@@ -187,9 +187,14 @@ var verify = function( publicKey, licenseData ) {
 		return
 	}
 
-	var isValid = crypto.createVerify( 'DSS1' )
-		.update( license.payloadSerialized )
-		.verify( publicKey, license.signature, 'hex' )
+	try {
+		var isValid = crypto.createVerify( 'DSS1' )
+			.update( license.payloadSerialized )
+			.verify( publicKey, license.signature, 'hex' )
+
+	} catch( e ) {
+		return false
+	}
 
 	return isValid
 }
