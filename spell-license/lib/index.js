@@ -14,7 +14,7 @@ var PRODUCTS = {
 	'SpellJS free' : {
 		features : [
 			{
-				name : 'forcedSplashScreen',
+				name : 'forceSplashScreen',
 				included : true
 			}
 		]
@@ -22,7 +22,7 @@ var PRODUCTS = {
 	'SpellJS standard' : {
 		features : [
 			{
-				name : 'forcedSplashScreen',
+				name : 'forceSplashScreen',
 				included : false
 			}
 		]
@@ -30,7 +30,7 @@ var PRODUCTS = {
 	'SpellJS professional' : {
 		features : [
 			{
-				name : 'forcedSplashScreen',
+				name : 'forceSplashScreen',
 				included : false
 			}
 		]
