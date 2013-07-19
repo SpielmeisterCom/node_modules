@@ -10,33 +10,6 @@ var	FORMAT_VERSION          = '01',
 	SIGNATURE_OFFSET        = SIGNATURE_LENGTH_OFFSET + SIGNATURE_LENGTH_LENGTH,
 	MAX_LINE_LENGTH         = 64
 
-var PRODUCTS = {
-	'SpellJS free' : {
-		features : [
-			{
-				name : 'forceSplashScreen',
-				included : true
-			}
-		]
-	},
-	'SpellJS standard' : {
-		features : [
-			{
-				name : 'forceSplashScreen',
-				included : false
-			}
-		]
-	},
-	'SpellJS professional' : {
-		features : [
-			{
-				name : 'forceSplashScreen',
-				included : false
-			}
-		]
-	}
-}
-
 /**
  * Creates a string representation of the numer of supplied length.
  *
@@ -248,15 +221,6 @@ var createLicenseInfo = function( publicKey, licenseData ) {
 		}
 	}
 
-	// product features
-	var product = PRODUCTS[ payload.pid ]
-
-	if( !product ) {
-		return {
-			error : 'Error: License includes unkown product id "' + payload.pid + '".'
-		}
-	}
-
 	// validity period
 	var nowInUnixtime            = Math.ceil( new Date().getTime() / 1000 ),
 		issueDateInUnixtime      = Math.ceil( new Date( payload.isd ).getTime() / 1000 ),
@@ -265,7 +229,6 @@ var createLicenseInfo = function( publicKey, licenseData ) {
 
 	return {
 		payload : payload,
-		productFeatures : product.features,
 		isInValidityPeriod : isInValidityPeriod,
 		isSignatureValid : isSignatureValid,
 		isValid : isSignatureValid && isInValidityPeriod
