@@ -10,13 +10,7 @@ module.exports = function( basePath ) {
 		return _.last( x.split( '.' ) ) == 'js'
 	}
 
-	var jsFilePaths = pathUtil.createPathsFromDirSync(
-		basePath,
-		filter,
-		{
-			absolute : true
-		}
-	)
+	var jsFilePaths = pathUtil.createPathsFromDirSync( basePath, filter, 'absolute' )
 
 	return _.reduce(
 		jsFilePaths,
