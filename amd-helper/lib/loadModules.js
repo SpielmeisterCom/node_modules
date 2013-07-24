@@ -6,11 +6,7 @@ var loadModule = require( './loadModule' ),
 	_          = require( 'underscore' )
 
 module.exports = function( basePath ) {
-	var filter = function( x ) {
-		return _.last( x.split( '.' ) ) == 'js'
-	}
-
-	var jsFilePaths = pathUtil.createPathsFromDirSync( basePath, filter, 'absolute' )
+	var jsFilePaths = pathUtil.createFilePathsFromDirSync( basePath, [ 'js' ], 'absolute' )
 
 	return _.reduce(
 		jsFilePaths,
