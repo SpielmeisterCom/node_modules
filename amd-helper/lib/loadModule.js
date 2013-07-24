@@ -4,13 +4,13 @@ var extractModuleHeader = require( './extractModuleHeader' ),
 
 
 module.exports = function( filePath ) {
-	var fileContent = fs.readFileSync( filePath ).toString( 'utf-8' )
+	var fileContent = fs.readFileSync( filePath ).toString()
 
 	try {
 		var moduleHeader = extractModuleHeader( fileContent )
 
 	} catch( e ) {
-		console.error( 'Error: Loading a module triggered the following exception when processing file \'' + filePath + '\'.\n' + e )
+		console.error( 'Error: Loading a module triggered the following exception when processing file "' + filePath + '".\n' + e )
 		process.exit( 1 )
 	}
 
@@ -18,7 +18,7 @@ module.exports = function( filePath ) {
 	if( !moduleHeader ) return
 
 	if( !moduleHeader.name ) {
-		console.error( 'Error: Anonymous module in file \'' + filePath + '\' is not supported.' )
+		console.error( 'Error: Anonymous module in file "' + filePath + '" is not supported.' )
 		return
 	}
 

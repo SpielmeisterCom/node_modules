@@ -1,20 +1,27 @@
 var loadModule = require( './loadModule' ),
-	fs   = require( 'fs' ),
-	flob = require( 'flob' ),
-	path = require( 'path' ),
-	_    = require( 'underscore' )
+	fs         = require( 'fs' ),
+	wrench     = require( 'wrench' ),
+	path       = require( 'path' ),
+	pathUtil   = require( 'pathUtil' ),
+	_          = require( 'underscore' )
 
+module.exports = function( basePath ) {
+	var filter = function( x ) {
+		return _.last( x.split( '.' ) ) == 'js'
+	}
 
-module.exports = function( sourcePath ) {
-	var filePattern = path.relative( process.cwd(), sourcePath ).replace( /\\/g, "/") + '/**/*.js',
-		filePaths   = flob.sync( filePattern, {} )
+	var jsFilePaths = pathUtil.createPathsFromDirSync(
+		basePath,
+		filter,
+		{
+			absolute : true
+		}
+	)
 
 	return _.reduce(
-		filePaths,
+		jsFilePaths,
 		function( memo, filePath ) {
-			var module = loadModule(
-				path.resolve( process.cwd(), filePath )
-			)
+			var module = loadModule( filePath )
 
 			if( module ) {
 				memo[ module.name ] = _.pick( module, [ 'dependencies', 'source', 'path' ] )
