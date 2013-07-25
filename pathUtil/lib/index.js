@@ -13,7 +13,7 @@ var path   = require( 'path' ),
 var createPathsFromDirSync = function( basePath, filter, mode ) {
 	mode = mode ? mode : 'relative'
 
-	var tmp  = wrench.readdirSyncRecursive( path.relative( process.cwd(), basePath ) )
+	var tmp = wrench.readdirSyncRecursive( basePath )
 
 	if( mode == 'absolute' ) {
 		tmp = _.map(
