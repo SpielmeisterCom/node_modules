@@ -200,9 +200,10 @@ var createPayload = function( licenseData ) {
  *
  * @param publicKey
  * @param licenseData
+ * @param referenceDateTimestamp this timestamp is used to check if the license is in its validity period
  * @return {Object}
  */
-var createLicenseInfo = function( publicKey, licenseData ) {
+var createLicenseInfo = function( publicKey, licenseData, referenceDateTimestamp ) {
 	// signature
 	var isSignatureValid = verify( publicKey, licenseData )
 
@@ -221,11 +222,19 @@ var createLicenseInfo = function( publicKey, licenseData ) {
 		}
 	}
 
+	var referenceDate = referenceDateTimestamp ?
+		new Date( referenceDateTimestamp ) :
+		new Date()
+
 	// validity period
-	var nowInUnixtime            = Math.ceil( new Date().getTime() / 1000 ),
-		issueDateInUnixtime      = Math.ceil( new Date( payload.isd ).getTime() / 1000 ),
+	var issueDateInUnixtime      = Math.ceil( new Date( payload.isd ).getTime() / 1000 ),
+		referenceDateInUnixtime  = Math.ceil( new Date( referenceDate ).getTime() / 1000 ),
 		validityPeriodInUnixtime = payload.days * 24 * 60 * 60,
-		isInValidityPeriod       = nowInUnixtime < issueDateInUnixtime + validityPeriodInUnixtime
+		isInValidityPeriod       = referenceDateInUnixtime < issueDateInUnixtime + validityPeriodInUnixtime
+
+	console.log( 'referenceDateInUnixtime: ' + referenceDateInUnixtime )
+	console.log( 'issueDateInUnixtime + validityPeriodInUnixtime: ' + ( issueDateInUnixtime + validityPeriodInUnixtime ) )
+	console.log( 'isInValidityPeriod: ' + isInValidityPeriod )
 
 	return {
 		payload : payload,
