@@ -15,7 +15,36 @@ var fs     = require( 'fs' ),
 var createPathsFromDirSync = function( basePath, filter, mode ) {
 	mode = mode ? mode : 'relative'
 
-	var tmp = wrench.readdirSyncRecursive( basePath )
+	var walk = function( dirPath, relativeFsoPath ) {
+		relativeFsoPath = relativeFsoPath || ''
+
+		var results     = [],
+			fullFsoPath = path.join( dirPath, relativeFsoPath ),
+			listing     = fs.readdirSync( fullFsoPath )
+
+		listing.forEach(
+			function( x ) {
+				var currentFsoPath = path.join( fullFsoPath, x ),
+					stat           = fs.statSync( currentFsoPath )
+
+				if( stat && stat.isDirectory() ) {
+					results = results.concat(
+						walk(
+							dirPath,
+							path.join( relativeFsoPath, x )
+						)
+					)
+
+				} else {
+					results.push( path.join( relativeFsoPath, x ) )
+				}
+			}
+		)
+
+		return results;
+	}
+
+	var tmp = walk( basePath )
 
 	if( mode == 'absolute' ) {
 		tmp = _.map(
