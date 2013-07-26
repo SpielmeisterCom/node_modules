@@ -1,4 +1,6 @@
-var path   = require( 'path' ),
+var fs     = require( 'fs' ),
+	os     = require( 'os' ),
+	path   = require( 'path' ),
 	wrench = require( 'wrench' ),
 	_      = require( 'underscore' )
 
@@ -59,7 +61,85 @@ var createFilePathsFromDirSync = function( basePath, extensions, mode ) {
 	return createPathsFromDirSync( basePath, filter, mode )
 }
 
+/**
+ * Creates an object which grants access to os specific locations like appDataPath, homePath and tempPath.
+ *
+ * @return {Object}
+ */
+var createOsPath = function() {
+	var type = os.type().toLowerCase()
+
+	if( type.indexOf( 'darwin' ) === 0 ) {
+		return {
+			createAppDataPath : function( appName ) {
+				return this.getHomePath() + '/Library/Application Support/' + appName
+			},
+			getHomePath : function() {
+				return process.env.HOME
+			},
+			getTempPath : function() {
+				return '/tmp'
+			}
+		}
+
+	} else if( type.indexOf( 'lin' ) === 0 ) {
+		return {
+			createAppDataPath : function( appName ) {
+				return this.getHomePath() + '/.config/' + appName
+			},
+			getHomePath : function() {
+				return process.env.HOME
+			},
+			getTempPath : function() {
+				return '/tmp'
+			}
+		}
+
+	} else if( type.indexOf( 'win' ) === 0 ) {
+		return {
+			createAppDataPath : function( appName ) {
+				var appDataPath = process.env.LOCALAPPDATA || process.env.APPDATA
+
+				return appDataPath + '\\' + appName
+			},
+			getHomePath : function() {
+				return process.env.USERPROFILE
+			},
+			getTempPath : function() {
+				return process.env.TEMP
+			}
+		}
+	}
+}
+
+/**
+ * Creates a path to a config file including overridePath, appName and fileName in the process. First the config is searched in overridePath then in
+ * appDataPath.
+ *
+ * @param overridePath
+ * @param appName
+ * @param fileName
+ * @return {*}
+ */
+var createConfigFilePath = function( overridePath, appName, fileName ) {
+	var environmentConfigFilePath = path.resolve( overridePath, fileName )
+
+	if( fs.existsSync( environmentConfigFilePath ) ) {
+		return environmentConfigFilePath
+	}
+
+	var appDataPath = createOsPath().createAppDataPath( appName )
+
+	environmentConfigFilePath = path.resolve( appDataPath, fileName )
+
+	if( fs.existsSync( environmentConfigFilePath ) ) {
+		return environmentConfigFilePath
+	}
+}
+
 module.exports = {
+	createConfigFilePath : createConfigFilePath,
+	createOsPath : createOsPath,
 	createPathsFromDirSync : createPathsFromDirSync,
 	createFilePathsFromDirSync : createFilePathsFromDirSync
 }
