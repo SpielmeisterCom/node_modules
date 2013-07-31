@@ -175,7 +175,7 @@ var createConfigFilePath = function( initialPath, appName, fileName ) {
 
 	var appDataPath = createOsPath().createAppDataPath( appName )
 
-	environmentConfigFilePath = path.resolve( appDataPath, fileName )
+	environmentConfigFilePath = path.join( appDataPath, fileName )
 
 	if( fs.existsSync( environmentConfigFilePath ) ) {
 		return environmentConfigFilePath
