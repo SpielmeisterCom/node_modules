@@ -46,7 +46,33 @@ var copyFiles = function( sourceDirectoryPath, targetDirectoryPath, filePaths ) 
 	)
 }
 
+var isDirectory = function( directoryPath ) {
+	if( fs.existsSync( directoryPath ) ) {
+		var stat = fs.lstatSync( directoryPath )
+
+		if( stat.isDirectory() ) {
+			return true
+		}
+	}
+
+	return false
+}
+
+var isFile = function( filePath ) {
+	if( fs.existsSync( filePath ) ) {
+		var stat = fs.lstatSync( filePath )
+
+		if( stat.isFile() ) {
+			return true
+		}
+	}
+
+	return false
+}
+
 module.exports = {
 	copyFiles : copyFiles,
-	copyFile : copyFile
+	copyFile : copyFile,
+	isDirectory : isDirectory,
+	isFile : isFile
 }
